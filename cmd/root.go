@@ -1,22 +1,39 @@
 /*
 Copyright © 2025 - github.com/mdxabu
-
 */
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 )
-
-
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "genp",
 	Short: "Generate Password, store and encrypted in CLI",
 	Long: `Generate`,
+	
+	Run: func(cmd *cobra.Command, args []string) {
+		asciiBanner := `
+  /$$$$$$                      /$$$$$$$ 
+ /$$__  $$                    | $$__  $$
+| $$  \__/  /$$$$$$  /$$$$$$$ | $$  \ $$
+| $$ /$$$$ /$$__  $$| $$__  $$| $$$$$$$/
+| $$|_  $$| $$$$$$$$| $$  \ $$| $$____/ 
+| $$  \ $$| $$_____/| $$  | $$| $$      
+|  $$$$$$/|  $$$$$$$| $$  | $$| $$      
+ \______/  \_______/|__/  |__/|__/      
+                                        
+                                        
+                                        
+		`
+		
+		fmt.Println(asciiBanner)
+		fmt.Println("Welcome to GenP, to create and store password E2EE :)")
+	},
 
 }
 
