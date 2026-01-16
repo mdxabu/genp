@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/mdxabu/genp/internal"
+	"github.com/mdxabu/genp/internal/store"
 	"github.com/spf13/cobra"
 )
 
@@ -31,8 +32,15 @@ You can specify which character types to include in your password:
 Example:
   genp create -0 -A -$ --length 16`,
 	Run: func(cmd *cobra.Command, args []string) {
+		var userWish string
 		password := internal.GeneratePassword(passwordLength, includeNumbers, includeUppercase, includeSpecial)
 		fmt.Println("Generated Password:", password)
+		fmt.Print("Do you want to store this password (y/n)?: ")
+		fmt.Scanln(&userWish)
+		if userWish == "y" {
+			store.StorepasswordLocally(password)
+		}
+		
 	},
 }
 
