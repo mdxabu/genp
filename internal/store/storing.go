@@ -1,6 +1,9 @@
 package store
 
-import "fmt"
+import (
+	"fmt"
+	"runtime"
+)
 
 /*
  * This file will have an integration with GitHub to create a private repo on the user's account. Whenever a password is stored,
@@ -12,6 +15,19 @@ import "fmt"
 	fmt.Print("Enter a name for the password: ")
 	fmt.Scanln(&passwordName)
 	
+	OSName := runtime.GOOS
+	
+// This part has to be executed soon for os level password storing on hidden file
+	switch OSName {
+	case "windows":
+		fmt.Println("Stored in this <folder> on Windows")
+	case "linux":
+		fmt.Println("Stored in this <folder> on Linux")
+	case "darwin":
+		fmt.Println("Stored in this <folder> on MacOS")
+	default:
+		fmt.Println("Unsupported OS")
+	}
 	
 	
 	fmt.Println("Password stored locally in a encrypted mode.")
