@@ -22,3 +22,6 @@
 go.work
 
 .DS_Store
+
+# build file
+genp

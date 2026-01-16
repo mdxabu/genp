@@ -30,4 +30,3 @@ func StorepasswordRemotely(password string) {
 	
 	
 }
-

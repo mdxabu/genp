@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/spf13/cobra"
 )
@@ -33,6 +34,8 @@ var rootCmd = &cobra.Command{
 		
 		fmt.Println(asciiBanner)
 		fmt.Println("Welcome to GenP, to create and store password E2EE :)")
+		
+		fmt.Printf("GenP is running on %s\n", runtime.GOOS)
 	},
 
 }
