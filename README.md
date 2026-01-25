@@ -28,4 +28,3 @@
 GenP focuses on security and simplicity. All passwords are encrypted locally using industry-standard encryption before being stored. The encryption keys are derived from your master password, meaning that your data remains secure and only accessible to you. No passwords or encryption keys are ever transmitted to external servers.
 
 The tool is designed for users who prefer command-line utilities and want full control over their password management without relying on third-party cloud services.
- 
