@@ -24,7 +24,7 @@ jobs:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           prow-commands: "/assign
             /unassign
-            /approve
+
             /retitle
             /area
             /kind
