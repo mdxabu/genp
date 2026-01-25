@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prow essential commands
-        uses: jpmcb/prow-github-actions@v2
+        uses: jpmcb/prow-github-actions@v2.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           prow-commands: >
