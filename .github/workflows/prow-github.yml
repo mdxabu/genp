@@ -15,7 +15,51 @@ jobs:
   prow:
     runs-on: ubuntu-latest
     steps:
-      - name: Prow essential commands
+      - name: Ensure required labels exist
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const labels = [
+              { name: 'lgtm', description: 'Looks good to me' },
+              { name: 'hold', description: 'Hold merge until resolved' },
+              { name: 'automerge', description: 'Eligible for automatic merge' },
+            ];
+            async function ensureLabel({ name, color, description }) {
+              try {
+                const existing = await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name,
+                });
+                const needsUpdate =
+                  ((existing.data.description || '') !== (description || ''));
+                if (needsUpdate) {
+                  await github.rest.issues.updateLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name,
+                    description,
+                  });
+                }
+              } catch (e) {
+                if (e.status === 404) {
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name,
+                    description,
+                  });
+                } else {
+                  throw e;
+                }
+              }
+            }
+            for (const label of labels) {
+              await ensureLabel(label);
+            }
+
+      - name: Prow commands
         uses: jpmcb/prow-github-actions@v2.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
