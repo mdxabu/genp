@@ -1,22 +1,27 @@
-name: prow-automerge
+name: prow-github
 
 on:
-  pull_request:
-    types: [opened, reopened, synchronize, labeled, unlabeled]
   issue_comment:
     types: [created]
+  pull_request:
+    types: [opened, reopened, synchronize]
 
 permissions:
-  contents: write
-  pull-requests: write
   issues: write
+  pull-requests: write
+  contents: read
 
 jobs:
   prow:
     runs-on: ubuntu-latest
     steps:
-      - name: Run Prow Commands
-        uses: jpmcb/prow-github-actions@v2.0.0
+      - name: Prow essential commands
+        uses: jpmcb/prow-github-actions@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          prow-commands: "/lgtm /approve /hold /hold-cancel automerge remove-lgtm"
+          prow-commands: >
+            /lgtm
+            /approve
+            /hold
+            /hold cancel
+            /automerge
