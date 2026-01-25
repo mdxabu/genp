@@ -12,6 +12,8 @@ permissions:
   issues: write
   # Allow adding a review to a pull request
   pull-requests: write
+  # Allow reading repository contents (needed for OWNERS file access)
+  contents: read
 
 jobs:
   prow-execute:
