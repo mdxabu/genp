@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -32,7 +32,8 @@ var rootCmd = &cobra.Command{
                                         
 		`
 		
-		fmt.Println(asciiBanner)
+		color.Cyan(asciiBanner)
+		// fmt.Println(asciiBanner)
 		fmt.Println("Welcome to GenP, to create and store password E2EE :)")
 		
 		fmt.Printf("GenP is running on %s\n", runtime.GOOS)
