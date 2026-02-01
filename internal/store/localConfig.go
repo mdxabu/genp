@@ -1,3 +1,8 @@
+/*
+Copyright © 2026 @mdxabu
+
+*/
+
 package store
 
 import (
