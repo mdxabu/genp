@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // StoreLocalConfig creates a cross-platform config directory and writes a credentials file
@@ -38,8 +39,34 @@ func StoreLocalConfig(passwordName string, password string, osName string) (stri
 	// Create genp.yaml file inside the base config directory
 	confPath := filepath.Join(baseDir, "genp.yaml")
 
-	// Prepare YAML content. Overwrite on each call.
-	content := fmt.Sprintf("name: %q\npassword: %q\n", passwordName, password)
+	// Prepare YAML content under a top-level "password:" map supporting multiple entries.
+	// If the file exists and already has content, append a new entry under "password:".
+	// This is a simple line-based approach without full YAML parsing.
+	var content string
+	existing, readErr := os.ReadFile(confPath)
+	if readErr == nil {
+		existingStr := string(existing)
+		if existingStr == "" {
+			content = fmt.Sprintf("password:\n  %s: %q\n", passwordName, password)
+		} else {
+			// Ensure the header exists
+			if !strings.Contains(existingStr, "\npassword:\n") && !strings.HasPrefix(existingStr, "password:\n") {
+				// Prepend the header if missing
+				if existingStr[len(existingStr)-1] != '\n' {
+					existingStr += "\n"
+				}
+				existingStr = "password:\n" + existingStr
+			}
+			// Ensure newline at the end, then append the new entry
+			if existingStr[len(existingStr)-1] != '\n' {
+				existingStr += "\n"
+			}
+			content = existingStr + fmt.Sprintf("  %s: %q\n", passwordName, password)
+		}
+	} else {
+		// If the file doesn't exist or can't be read, start fresh
+		content = fmt.Sprintf("password:\n  %s: %q\n", passwordName, password)
+	}
 
 	// Write file with restrictive permissions:
 	// - Use os.WriteFile for brevity; set mode 0600 on Unix, best-effort on Windows.
