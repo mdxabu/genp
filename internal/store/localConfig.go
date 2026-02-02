@@ -10,7 +10,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
+
+	"github.com/mdxabu/genp/internal/crypto"
+	"gopkg.in/yaml.v3"
 )
 
 // StoreLocalConfig creates a cross-platform config directory and writes a credentials file
@@ -28,7 +32,7 @@ func StoreLocalConfig(passwordName string, password string, osName string) (stri
 		return "", errors.New("passwordName must not be empty")
 	}
 
-	baseDir, err := configBaseDir("genp", osName)
+	baseDir, err := ConfigBaseDir("genp", osName)
 	if err != nil {
 		return "", err
 	}
@@ -82,13 +86,13 @@ func StoreLocalConfig(passwordName string, password string, osName string) (stri
 	return confPath, nil
 }
 
-// configBaseDir determines the per-OS base config directory.
+// ConfigBaseDir determines the per-OS base config directory.
 // appName should be a stable identifier for your application.
 // Returns an absolute path like:
 // - Windows: %LOCALAPPDATA%\appName
 // - macOS: ~/Library/Application Support/appName
 // - Linux/Unix: $XDG_CONFIG_HOME/appName or ~/.config/appName
-func configBaseDir(appName string, osName string) (string, error) {
+func ConfigBaseDir(appName string, osName string) (string, error) {
 	switch osName {
 	case "windows":
 		// Prefer LOCALAPPDATA, fallback to APPDATA
@@ -124,4 +128,54 @@ func configBaseDir(appName string, osName string) (string, error) {
 		}
 		return filepath.Join(home, ".config", appName), nil
 	}
+}
+
+// PasswordEntry represents a stored password entry
+type PasswordEntry struct {
+	Name      string
+	Encrypted string
+}
+
+// GetAllPasswords reads all stored passwords from the config file
+// Returns a map of password names to their encrypted values
+func GetAllPasswords() (map[string]string, error) {
+	OSName := runtime.GOOS
+	baseDir, err := ConfigBaseDir("genp", OSName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to determine config directory: %w", err)
+	}
+
+	confPath := filepath.Join(baseDir, "genp.yaml")
+
+	// Check if file exists
+	if _, err := os.Stat(confPath); os.IsNotExist(err) {
+		return nil, fmt.Errorf("no passwords stored yet. Config file does not exist at: %s", confPath)
+	}
+
+	// Read the file
+	data, err := os.ReadFile(confPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read config file: %w", err)
+	}
+
+	// Parse YAML
+	var config struct {
+		Password map[string]string `yaml:"password"`
+	}
+
+	err = yaml.Unmarshal(data, &config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse config file: %w", err)
+	}
+
+	if len(config.Password) == 0 {
+		return nil, fmt.Errorf("no passwords found in config file")
+	}
+
+	return config.Password, nil
+}
+
+// DecryptPassword decrypts a single password using the master password
+func DecryptPassword(encryptedPassword string, masterPassword string) (string, error) {
+	return crypto.Decrypt(encryptedPassword, masterPassword)
 }
