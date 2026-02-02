@@ -25,7 +25,7 @@ func StorepasswordLocally(password string) {
 	OSName := runtime.GOOS
 	
 	// Get the config path to check if this is first time setup
-	baseDir, err := configBaseDir("genp", OSName)
+	baseDir, err := ConfigBaseDir("genp", OSName)
 	if err != nil {
 		fmt.Println("Failed to determine config directory:", err)
 		return

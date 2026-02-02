@@ -32,7 +32,7 @@ func StoreLocalConfig(passwordName string, password string, osName string) (stri
 		return "", errors.New("passwordName must not be empty")
 	}
 
-	baseDir, err := configBaseDir("genp", osName)
+	baseDir, err := ConfigBaseDir("genp", osName)
 	if err != nil {
 		return "", err
 	}
@@ -86,13 +86,13 @@ func StoreLocalConfig(passwordName string, password string, osName string) (stri
 	return confPath, nil
 }
 
-// configBaseDir determines the per-OS base config directory.
+// ConfigBaseDir determines the per-OS base config directory.
 // appName should be a stable identifier for your application.
 // Returns an absolute path like:
 // - Windows: %LOCALAPPDATA%\appName
 // - macOS: ~/Library/Application Support/appName
 // - Linux/Unix: $XDG_CONFIG_HOME/appName or ~/.config/appName
-func configBaseDir(appName string, osName string) (string, error) {
+func ConfigBaseDir(appName string, osName string) (string, error) {
 	switch osName {
 	case "windows":
 		// Prefer LOCALAPPDATA, fallback to APPDATA
@@ -140,7 +140,7 @@ type PasswordEntry struct {
 // Returns a map of password names to their encrypted values
 func GetAllPasswords() (map[string]string, error) {
 	OSName := runtime.GOOS
-	baseDir, err := configBaseDir("genp", OSName)
+	baseDir, err := ConfigBaseDir("genp", OSName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to determine config directory: %w", err)
 	}
