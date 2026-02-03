@@ -32,7 +32,7 @@ var rootCmd = &cobra.Command{
 		`
 		
 		color.Cyan(asciiBanner)
-		color.Green("Welcome to GenP, to create and store password E2EE :)")
+		color.Green("Welcome to GenP, to create and store password E2EE :)\n")
 		color.Yellow("GenP is running on %s\n", runtime.GOOS)
 	},
 

@@ -35,7 +35,7 @@ Example:
 	Run: func(cmd *cobra.Command, args []string) {
 		var userWish string
 		password := internal.GeneratePassword(passwordLength, includeNumbers, includeUppercase, includeSpecial)
-		color.Green("Generated Password: ")
+		color.New(color.FgGreen).Print("Generated Password: ")
 		color.Cyan("%s\n", password)
 		color.New(color.FgYellow).Print("Do you want to store this password (y/n)?: ")
 		fmt.Scanln(&userWish)
