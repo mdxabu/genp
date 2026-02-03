@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"runtime"
 
+	"github.com/fatih/color"
 	"github.com/mdxabu/genp/internal/crypto"
 )
 
@@ -19,7 +20,7 @@ import (
 
 func StorepasswordLocally(password string) {
 	var passwordName string
-	fmt.Print("Enter a name for the password: ")
+	color.Cyan("Enter a name for the password: ")
 	fmt.Scanln(&passwordName)
 
 	OSName := runtime.GOOS
@@ -27,7 +28,7 @@ func StorepasswordLocally(password string) {
 	// Get the config path to check if this is first time setup
 	baseDir, err := ConfigBaseDir("genp", OSName)
 	if err != nil {
-		fmt.Println("Failed to determine config directory:", err)
+		color.Red("Failed to determine config directory: %v\n", err)
 		return
 	}
 	
@@ -37,15 +38,15 @@ func StorepasswordLocally(password string) {
 		// Existing user - just prompt for password
 		masterPassword, err = crypto.PromptForMasterPassword("Enter master password: ")
 		if err != nil {
-			fmt.Println("Failed to read master password:", err)
+			color.Red("Failed to read master password: %v\n", err)
 			return
 		}
 	} else {
 		// First time - prompt with confirmation
-		fmt.Println("First time setup: Please create a master password to encrypt your passwords.")
+		color.Yellow("First time setup: Please create a master password to encrypt your passwords.\n")
 		masterPassword, err = crypto.PromptForMasterPasswordWithConfirm()
 		if err != nil {
-			fmt.Println("Failed to set master password:", err)
+			color.Red("Failed to set master password: %v\n", err)
 			return
 		}
 	}
@@ -53,24 +54,24 @@ func StorepasswordLocally(password string) {
 	// Encrypt the password
 	encryptedPassword, err := crypto.Encrypt(password, masterPassword)
 	if err != nil {
-		fmt.Println("Failed to encrypt password:", err)
+		color.Red("Failed to encrypt password: %v\n", err)
 		return
 	}
 
 	confPath, err := StoreLocalConfig(passwordName, encryptedPassword, OSName)
 	if err != nil {
-		fmt.Println("Failed to store password locally:", err)
+		color.Red("Failed to store password locally: %v\n", err)
 		return
 	}
 
-	fmt.Println("Password encrypted and stored locally at:", confPath)
+	color.Green("Password encrypted and stored locally at: %s\n", confPath)
 }
 
 func StorepasswordRemotely(password string) {
 	var passwordName string
-	fmt.Print("Enter a name for the password: ")
+	color.Cyan("Enter a name for the password: ")
 	fmt.Scanln(&passwordName)
 
-	fmt.Println("Password stored remotely on Github Private Repository in a encrypted mode.")
+	color.Green("Password stored remotely on Github Private Repository in a encrypted mode.\n")
 
 }

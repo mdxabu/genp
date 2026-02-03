@@ -11,6 +11,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/fatih/color"
 	"golang.org/x/term"
 )
 
@@ -21,7 +22,7 @@ func PromptForMasterPassword(promptText string) (string, error) {
 		promptText = "Enter master password: "
 	}
 
-	fmt.Print(promptText)
+	color.Magenta(promptText)
 	
 	// Read password without echoing
 	bytePassword, err := term.ReadPassword(int(syscall.Stdin))

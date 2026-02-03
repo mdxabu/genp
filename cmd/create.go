@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/mdxabu/genp/internal"
 	"github.com/mdxabu/genp/internal/store"
 	"github.com/spf13/cobra"
@@ -34,8 +35,9 @@ Example:
 	Run: func(cmd *cobra.Command, args []string) {
 		var userWish string
 		password := internal.GeneratePassword(passwordLength, includeNumbers, includeUppercase, includeSpecial)
-		fmt.Println("Generated Password:", password)
-		fmt.Print("Do you want to store this password (y/n)?: ")
+		color.Green("Generated Password: ")
+		color.Cyan("%s\n", password)
+		color.Yellow("Do you want to store this password (y/n)?: ")
 		fmt.Scanln(&userWish)
 		if userWish == "y" {
 			store.StorepasswordLocally(password)

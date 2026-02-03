@@ -5,8 +5,7 @@ Copyright © 2025 @mdxabu
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/fatih/color"
 	"github.com/mdxabu/genp/internal/crypto"
 	"github.com/mdxabu/genp/internal/store"
 	"github.com/spf13/cobra"
@@ -24,32 +23,33 @@ all stored passwords in decrypted form.`,
 		// Get all encrypted passwords
 		passwords, err := store.GetAllPasswords()
 		if err != nil {
-			fmt.Println("Error:", err)
+			color.Red("Error: %v\n", err)
 			return
 		}
 
 		// Prompt for master password
 		masterPassword, err := crypto.PromptForMasterPassword("Enter master password to decrypt: ")
 		if err != nil {
-			fmt.Println("Error reading master password:", err)
+			color.Red("Error reading master password: %v\n", err)
 			return
 		}
 
 		// Decrypt and display all passwords
-		fmt.Println("\n=== Stored Passwords ===")
+		color.Cyan("\n=== Stored Passwords ===\n")
 		hasError := false
 		for name, encrypted := range passwords {
 			decrypted, err := store.DecryptPassword(encrypted, masterPassword)
 			if err != nil {
-				fmt.Printf("%s: [Failed to decrypt - incorrect master password or corrupted data]\n", name)
+				color.Red("%s: [Failed to decrypt - incorrect master password or corrupted data]\n", name)
 				hasError = true
 				continue
 			}
-			fmt.Printf("%s: %s\n", name, decrypted)
+			color.Green("%s: ", name)
+			color.Yellow("%s\n", decrypted)
 		}
 
 		if hasError {
-			fmt.Println("\nNote: Some passwords could not be decrypted. Please check your master password.")
+			color.Red("\nNote: Some passwords could not be decrypted. Please check your master password.\n")
 		}
 	},
 }
