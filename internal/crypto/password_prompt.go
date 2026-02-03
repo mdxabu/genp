@@ -22,7 +22,7 @@ func PromptForMasterPassword(promptText string) (string, error) {
 		promptText = "Enter master password: "
 	}
 
-	color.Magenta(promptText)
+	color.New(color.FgMagenta).Print(promptText)
 	
 	// Read password without echoing
 	bytePassword, err := term.ReadPassword(int(syscall.Stdin))

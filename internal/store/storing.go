@@ -20,7 +20,7 @@ import (
 
 func StorepasswordLocally(password string) {
 	var passwordName string
-	color.Cyan("Enter a name for the password: ")
+	color.New(color.FgCyan).Print("Enter a name for the password: ")
 	fmt.Scanln(&passwordName)
 
 	OSName := runtime.GOOS
@@ -69,7 +69,7 @@ func StorepasswordLocally(password string) {
 
 func StorepasswordRemotely(password string) {
 	var passwordName string
-	color.Cyan("Enter a name for the password: ")
+	color.New(color.FgCyan).Print("Enter a name for the password: ")
 	fmt.Scanln(&passwordName)
 
 	color.Green("Password stored remotely on Github Private Repository in a encrypted mode.\n")
