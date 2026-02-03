@@ -4,7 +4,6 @@ Copyright © 2025 - github.com/mdxabu
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"runtime"
 	"github.com/fatih/color"
@@ -33,10 +32,8 @@ var rootCmd = &cobra.Command{
 		`
 		
 		color.Cyan(asciiBanner)
-		// fmt.Println(asciiBanner)
-		fmt.Println("Welcome to GenP, to create and store password E2EE :)")
-		
-		fmt.Printf("GenP is running on %s\n", runtime.GOOS)
+		color.Green("Welcome to GenP, to create and store password E2EE :)\n")
+		color.Yellow("GenP is running on %s\n", runtime.GOOS)
 	},
 
 }
