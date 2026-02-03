@@ -44,7 +44,7 @@ all stored passwords in decrypted form.`,
 				hasError = true
 				continue
 			}
-			color.Green("%s: ", name)
+			color.New(color.FgGreen).Printf("%s: ", name)
 			color.Yellow("%s\n", decrypted)
 		}
 
