@@ -14,7 +14,10 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "genp",
 	Short: "Generate Password, store and encrypted in CLI",
-	Long: `Generate`,
+	Long: `GenP - Password Generator and Manager
+
+Generate secure passwords and store them with end-to-end encryption.
+Use 'genp interactive' for a Claude Code-like interface with command palette.`,
 	
 	Run: func(cmd *cobra.Command, args []string) {
 		asciiBanner := `
