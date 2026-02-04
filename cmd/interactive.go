@@ -15,6 +15,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	cursorChar = "█"
+)
+
 // Command represents an available command in the interactive mode
 type Command struct {
 	Name        string
@@ -188,7 +192,7 @@ func (m model) View() string {
 	inputStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#00FF00"))
 	
-	b.WriteString(inputStyle.Render("> " + m.input + "█"))
+	b.WriteString(inputStyle.Render("> " + m.input + cursorChar))
 	b.WriteString("\n\n")
 
 	// Command list (if showing)
@@ -260,9 +264,10 @@ func executeShow() tea.Msg {
 		return executeResult{output: "No passwords stored yet.", exit: false}
 	}
 
-	// For interactive mode, we'll just show that passwords exist
-	// Full decryption would require password input which is complex in TUI
-	output := fmt.Sprintf("You have %d stored password(s).\nUse 'genp show' command for full access with master password.", len(passwords))
+	// For interactive mode, we don't decrypt passwords because secure password input
+	// in TUI requires complex terminal handling that could compromise security.
+	// The CLI mode provides a more secure environment for sensitive operations.
+	output := fmt.Sprintf("You have %d stored password(s).\n\nTo decrypt and view passwords, use the CLI command 'genp show' which provides secure terminal handling for master password input.", len(passwords))
 	return executeResult{output: output, exit: false}
 }
 
