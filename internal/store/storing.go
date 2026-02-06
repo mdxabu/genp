@@ -13,25 +13,20 @@ import (
 	"github.com/mdxabu/genp/internal/crypto"
 )
 
-/*
- * This file will have an integration with GitHub to create a private repo on the user's account. Whenever a password is stored,
- * it will be saved in the repo in a JSON file in an encrypted format.
- */
-
 func StorepasswordLocally(password string) {
 	var passwordName string
 	color.New(color.FgCyan).Print("Enter a name for the password: ")
 	fmt.Scanln(&passwordName)
 
 	OSName := runtime.GOOS
-	
+
 	// Get the config path to check if this is first time setup
 	baseDir, err := ConfigBaseDir("genp", OSName)
 	if err != nil {
 		color.Red("Failed to determine config directory: %v\n", err)
 		return
 	}
-	
+
 	// Prompt for master password
 	var masterPassword string
 	if crypto.CheckMasterPasswordExists(baseDir + "/genp.yaml") {
@@ -65,13 +60,4 @@ func StorepasswordLocally(password string) {
 	}
 
 	color.Green("Password encrypted and stored locally at: %s\n", confPath)
-}
-
-func StorepasswordRemotely(password string) {
-	var passwordName string
-	color.New(color.FgCyan).Print("Enter a name for the password: ")
-	fmt.Scanln(&passwordName)
-
-	color.Green("Password stored remotely on Github Private Repository in an encrypted mode.\n")
-
 }

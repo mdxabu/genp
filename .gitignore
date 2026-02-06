@@ -25,6 +25,3 @@ go.work
 
 # build file
 genp
-
-# Environment variables (secrets)
-.env
