@@ -76,4 +76,3 @@ genp show
 ```
 
 This will prompt for your master password and display all stored passwords.
- 
