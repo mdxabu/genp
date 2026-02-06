@@ -76,3 +76,22 @@ genp show
 ```
 
 This will prompt for your master password and display all stored passwords.
+
+#### GitHub Login
+
+GenP supports GitHub OAuth login for remote features. Since this is an open source project, the OAuth Client ID is **not** hardcoded in the source code. You must set it as an environment variable before logging in:
+
+```bash
+# Set your GitHub OAuth Client ID
+export GITHUB_CLIENT_ID=your_client_id
+
+# Login via GitHub device flow
+genp login
+
+# Logout and remove the stored token
+genp logout
+```
+
+The token is stored locally in your `genp.yaml` config file alongside your encrypted passwords — no separate token file is created.
+
+> **Note:** You can add `export GITHUB_CLIENT_ID=your_client_id` to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.) so it's always available.
