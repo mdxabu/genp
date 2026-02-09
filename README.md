@@ -1,18 +1,6 @@
 # GenP
+[![Release](https://github.com/mdxabu/genp/actions/workflows/release.yml/badge.svg)](https://github.com/mdxabu/genp/actions/workflows/release.yml)
 
-```bash
-
-  /$$$$$$                      /$$$$$$$ 
- /$$__  $$                    | $$__  $$
-| $$  \__/  /$$$$$$  /$$$$$$$ | $$  \ $$
-| $$ /$$$$ /$$__  $$| $$__  $$| $$$$$$$/
-| $$|_  $$| $$$$$$$$| $$  \ $$| $$____/ 
-| $$  \ $$| $$_____/| $$  | $$| $$      
-|  $$$$$$/|  $$$$$$$| $$  | $$| $$      
- \______/  \_______/|__/  |__/|__/     
- 
- ```
- 
  GenP is a command-line tool for generating passwords and storing them in E2EE (End-to-End Encrypted) mode. It provides a secure way to manage your passwords and ensures that only you have access to them.
 
 ## Installation
@@ -20,7 +8,9 @@
 ### Homebrew (macOS/Linux)
 
 ```bash
-brew install mdxabu/tap/genp
+brew tap mdxabu/tap/
+
+brew install genp
 ```
 
 ### Go
