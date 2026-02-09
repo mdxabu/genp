@@ -31,8 +31,6 @@ go build -o genp .
 
 - Generate strong, random passwords with customizable length and character sets
 - Store passwords securely with end-to-end encryption
-- **Interactive mode with Claude Code-like command palette** - Type `/` to see all available commands
-- Command-line interface for easy integration into workflows
 - Local storage with encryption ensuring your passwords never leave your device unencrypted
 - Simple and intuitive commands for password management
 
@@ -44,27 +42,6 @@ The tool is designed for users who prefer command-line utilities and want full c
 
 ## Usage
 
-### Interactive Mode (Recommended)
-
-GenP now features an interactive mode with a Claude Code-like command palette:
-
-```bash
-genp interactive
-# or use the short alias
-genp i
-```
-
-In interactive mode:
-- Type `/` to see all available commands
-- Use ↑↓ arrow keys to navigate the command list
-- Press Enter to execute a selected command
-- Type commands directly (e.g., `/create`, `/show`, `/help`)
-- Press Esc to cancel or Ctrl+C to exit
-
-### Traditional CLI Mode
-
-You can also use GenP with traditional command-line arguments:
-
 #### Generate a Password
 
 ```bash
@@ -72,7 +49,7 @@ You can also use GenP with traditional command-line arguments:
 genp create
 
 # Generate a password with specific options
-genp create -0 -A -$ --length 16
+genp create -0 -A -$ -l 16
 ```
 
 Options:
