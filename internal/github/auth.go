@@ -5,7 +5,6 @@ Copyright 2025 - github.com/mdxabu
 package github
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -19,37 +18,15 @@ import (
 )
 
 const (
-	githubAPIBase       = "https://api.github.com"
-	githubDeviceCodeURL = "https://github.com/login/device/code"
-	githubAccessToken   = "https://github.com/login/oauth/access_token"
-	// GenP's OAuth App Client ID - users can replace this with their own
-	defaultClientID = "GENP_GITHUB_CLIENT_ID"
-	tokenFileName   = "github_token"
+	githubAPIBase = "https://api.github.com"
+	tokenFileName = "github_token"
 )
 
 // TokenInfo stores the GitHub authentication token and metadata
 type TokenInfo struct {
 	Token     string `json:"token"`
-	LoginType string `json:"login_type"` // "token" or "oauth"
+	LoginType string `json:"login_type"`
 	Username  string `json:"username"`
-}
-
-// DeviceCodeResponse represents the response from GitHub's device code endpoint
-type DeviceCodeResponse struct {
-	DeviceCode      string `json:"device_code"`
-	UserCode        string `json:"user_code"`
-	VerificationURI string `json:"verification_uri"`
-	ExpiresIn       int    `json:"expires_in"`
-	Interval        int    `json:"interval"`
-}
-
-// OAuthTokenResponse represents the response from GitHub's access token endpoint
-type OAuthTokenResponse struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-	Scope       string `json:"scope"`
-	Error       string `json:"error,omitempty"`
-	ErrorDesc   string `json:"error_description,omitempty"`
 }
 
 // GitHubUser represents basic GitHub user info
@@ -80,54 +57,6 @@ func LoginWithToken(token string) (*TokenInfo, error) {
 	info := &TokenInfo{
 		Token:     token,
 		LoginType: "token",
-		Username:  user.Login,
-	}
-
-	// Save the token
-	if err := saveToken(info); err != nil {
-		return nil, fmt.Errorf("failed to save token: %w", err)
-	}
-
-	return info, nil
-}
-
-// LoginWithOAuth initiates the OAuth device flow for GitHub authentication
-func LoginWithOAuth(clientID string) (*TokenInfo, error) {
-	if clientID == "" {
-		clientID = os.Getenv("GENP_GITHUB_CLIENT_ID")
-		if clientID == "" {
-			return nil, fmt.Errorf("GitHub OAuth Client ID not set. Set GENP_GITHUB_CLIENT_ID environment variable or pass --client-id flag")
-		}
-	}
-
-	// Step 1: Request device code
-	deviceCode, err := requestDeviceCode(clientID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to request device code: %w", err)
-	}
-
-	fmt.Printf("\nGitHub Device Authentication\n")
-	fmt.Printf("-------------------------------\n")
-	fmt.Printf("1. Open this URL in your browser: %s\n", deviceCode.VerificationURI)
-	fmt.Printf("2. Enter this code: %s\n", deviceCode.UserCode)
-	fmt.Printf("-------------------------------\n")
-	fmt.Printf("Waiting for authorization...\n\n")
-
-	// Step 2: Poll for the access token
-	token, err := pollForToken(clientID, deviceCode)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get access token: %w", err)
-	}
-
-	// Step 3: Validate and get user info
-	user, err := getAuthenticatedUser(token)
-	if err != nil {
-		return nil, fmt.Errorf("failed to validate token: %w", err)
-	}
-
-	info := &TokenInfo{
-		Token:     token,
-		LoginType: "oauth",
 		Username:  user.Login,
 	}
 
@@ -235,119 +164,4 @@ func getAuthenticatedUser(token string) (*GitHubUser, error) {
 	}
 
 	return &user, nil
-}
-
-// requestDeviceCode initiates the OAuth device flow
-func requestDeviceCode(clientID string) (*DeviceCodeResponse, error) {
-	payload := map[string]string{
-		"client_id": clientID,
-		"scope":     "repo",
-	}
-
-	jsonPayload, err := json.Marshal(payload)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", githubDeviceCodeURL, bytes.NewBuffer(jsonPayload))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")
-
-	client := &http.Client{Timeout: 30 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to GitHub: %w", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response: %w", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GitHub returned status %d: %s", resp.StatusCode, string(body))
-	}
-
-	var deviceCode DeviceCodeResponse
-	if err := json.Unmarshal(body, &deviceCode); err != nil {
-		return nil, fmt.Errorf("failed to parse device code response: %w", err)
-	}
-
-	return &deviceCode, nil
-}
-
-// pollForToken polls GitHub for the access token after device code authorization
-func pollForToken(clientID string, deviceCode *DeviceCodeResponse) (string, error) {
-	interval := deviceCode.Interval
-	if interval < 5 {
-		interval = 5
-	}
-
-	deadline := time.Now().Add(time.Duration(deviceCode.ExpiresIn) * time.Second)
-
-	for time.Now().Before(deadline) {
-		time.Sleep(time.Duration(interval) * time.Second)
-
-		payload := map[string]string{
-			"client_id":   clientID,
-			"device_code": deviceCode.DeviceCode,
-			"grant_type":  "urn:ietf:params:oauth:grant-type:device_code",
-		}
-
-		jsonPayload, err := json.Marshal(payload)
-		if err != nil {
-			return "", err
-		}
-
-		req, err := http.NewRequest("POST", githubAccessToken, bytes.NewBuffer(jsonPayload))
-		if err != nil {
-			return "", err
-		}
-		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Accept", "application/json")
-
-		client := &http.Client{Timeout: 30 * time.Second}
-		resp, err := client.Do(req)
-		if err != nil {
-			continue // Retry on network errors
-		}
-
-		body, err := io.ReadAll(resp.Body)
-		resp.Body.Close()
-		if err != nil {
-			continue
-		}
-
-		var tokenResp OAuthTokenResponse
-		if err := json.Unmarshal(body, &tokenResp); err != nil {
-			continue
-		}
-
-		switch tokenResp.Error {
-		case "":
-			// Success
-			if tokenResp.AccessToken != "" {
-				return tokenResp.AccessToken, nil
-			}
-		case "authorization_pending":
-			// User hasn't authorized yet, keep polling
-			continue
-		case "slow_down":
-			// We're polling too fast, increase interval
-			interval += 5
-			continue
-		case "expired_token":
-			return "", fmt.Errorf("device code expired. Please try again")
-		case "access_denied":
-			return "", fmt.Errorf("authorization denied by user")
-		default:
-			return "", fmt.Errorf("OAuth error: %s - %s", tokenResp.Error, tokenResp.ErrorDesc)
-		}
-	}
-
-	return "", fmt.Errorf("authorization timed out. Please try again")
 }

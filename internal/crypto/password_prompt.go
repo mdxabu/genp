@@ -1,6 +1,5 @@
 /*
-Copyright © 2026 @mdxabu
-
+Copyright 2025 - github.com/mdxabu
 */
 
 package crypto
@@ -15,19 +14,19 @@ import (
 	"golang.org/x/term"
 )
 
-// PromptForMasterPassword prompts the user to enter a master password
-// without echoing it to the terminal. Returns the password or an error.
+// PromptForMasterPassword prompts the user to enter their system lock screen
+// password once (without echoing) and verifies it against the OS.
+// On success it returns the verified password for use as the encryption key.
 func PromptForMasterPassword(promptText string) (string, error) {
 	if promptText == "" {
-		promptText = "Enter master password: "
+		promptText = "Enter system password: "
 	}
 
 	color.New(color.FgMagenta).Print(promptText)
-	
-	// Read password without echoing
+
 	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
-	fmt.Println() // Add newline after password input
-	
+	fmt.Println()
+
 	if err != nil {
 		return "", fmt.Errorf("failed to read password: %w", err)
 	}
@@ -37,32 +36,24 @@ func PromptForMasterPassword(promptText string) (string, error) {
 		return "", fmt.Errorf("password cannot be empty")
 	}
 
+	// Verify the password against the operating system
+	if err := VerifySystemPassword(password); err != nil {
+		return "", fmt.Errorf("authentication failed: %w", err)
+	}
+
 	return password, nil
 }
 
-// PromptForMasterPasswordWithConfirm prompts for a master password twice
-// to confirm it matches. Used when setting a new master password.
-func PromptForMasterPasswordWithConfirm() (string, error) {
-	password1, err := PromptForMasterPassword("Enter master password: ")
-	if err != nil {
-		return "", err
-	}
-
-	password2, err := PromptForMasterPassword("Confirm master password: ")
-	if err != nil {
-		return "", err
-	}
-
-	if password1 != password2 {
-		return "", fmt.Errorf("passwords do not match")
-	}
-
-	return password1, nil
+// CheckMasterPasswordExists checks if a config file already exists at the
+// given path, which indicates passwords have been stored before.
+func CheckMasterPasswordExists(configPath string) bool {
+	// No longer used for branching into a double-prompt flow, but kept for
+	// backward compatibility with callers that check whether the config
+	// file is present (e.g. to print different informational messages).
+	return fileExists(configPath)
 }
 
-// CheckMasterPasswordExists checks if a master password has been set
-// by checking if the config file exists
-func CheckMasterPasswordExists(configPath string) bool {
-	_, err := os.Stat(configPath)
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
 	return err == nil
 }

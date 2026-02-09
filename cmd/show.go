@@ -1,6 +1,5 @@
 /*
 Copyright © 2025 @mdxabu
-
 */
 package cmd
 
@@ -16,7 +15,7 @@ var showCmd = &cobra.Command{
 	Use:   "show",
 	Short: "Display stored passwords",
 	Long: `Display all stored passwords after decrypting them with your master password.
-	
+
 This command will prompt you for your master password and then display
 all stored passwords in decrypted form.`,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -28,7 +27,7 @@ all stored passwords in decrypted form.`,
 		}
 
 		// Prompt for master password
-		masterPassword, err := crypto.PromptForMasterPassword("Enter master password to decrypt: ")
+		masterPassword, err := crypto.PromptForMasterPassword("Enter system password: ")
 		if err != nil {
 			color.Red("Error reading master password: %v\n", err)
 			return

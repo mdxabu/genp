@@ -14,9 +14,7 @@ import (
 )
 
 var (
-	loginToken    string
-	loginOAuth    bool
-	oauthClientID string
+	loginToken string
 )
 
 // loginCmd represents the login command
@@ -26,19 +24,19 @@ var loginCmd = &cobra.Command{
 	Long: `Login to GitHub to enable automatic syncing of your encrypted passwords
 to a private repository called 'genp-vault'.
 
-You can authenticate using either:
-  1. A personal access token (PAT) with the 'repo' scope
-  2. OAuth device flow (browser-based)
+Authenticate using a personal access token (PAT) with the 'repo' scope.
+
+To create a personal access token:
+  1. Go to https://github.com/settings/tokens
+  2. Generate a new token (classic) with 'repo' scope
+  3. Run: genp login --token <your-token>
 
 Examples:
-  genp login --token ghp_xxxxxxxxxxxxxxxxxxxx
-  genp login --oauth
-  genp login --oauth --client-id YOUR_CLIENT_ID`,
+  genp login --token ghp_xxxxxxxxxxxxxxxxxxxx`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if loginToken == "" && !loginOAuth {
-			color.Yellow("Please specify a login method:\n")
+		if loginToken == "" {
+			color.Yellow("Please specify a token:\n")
 			color.Cyan("  genp login --token <your-github-token>\n")
-			color.Cyan("  genp login --oauth [--client-id <client-id>]\n")
 			fmt.Println()
 			color.White("To create a personal access token:\n")
 			color.White("  1. Go to https://github.com/settings/tokens\n")
@@ -47,16 +45,7 @@ Examples:
 			return
 		}
 
-		if loginToken != "" && loginOAuth {
-			color.Red("Error: cannot use both --token and --oauth at the same time\n")
-			return
-		}
-
-		if loginToken != "" {
-			loginWithToken()
-		} else if loginOAuth {
-			loginWithOAuth()
-		}
+		loginWithToken()
 	},
 }
 
@@ -69,7 +58,7 @@ var statusCmd = &cobra.Command{
 		tokenInfo, err := github.LoadToken()
 		if err != nil {
 			color.Red("Not logged in to GitHub.\n")
-			color.Yellow("Run 'genp login --token <token>' or 'genp login --oauth' to authenticate.\n")
+			color.Yellow("Run 'genp login --token <token>' to authenticate.\n")
 			return
 		}
 
@@ -149,31 +138,10 @@ func loginWithToken() {
 	setupVaultAndSync(token)
 }
 
-func loginWithOAuth() {
-	color.Cyan("Starting GitHub OAuth device flow...\n")
-
-	info, err := github.LoginWithOAuth(oauthClientID)
-	if err != nil {
-		color.Red("Error: %v\n", err)
-		return
-	}
-
-	color.Green("\n[ok] Successfully logged in as %s\n", info.Username)
-
-	tokenPath, err := github.GetTokenStorePath()
-	if err == nil {
-		color.Cyan("Token stored at: %s\n", tokenPath)
-	}
-
-	setupVaultAndSync(info.Token)
-}
-
 func init() {
 	rootCmd.AddCommand(loginCmd)
 	rootCmd.AddCommand(logoutCmd)
 	loginCmd.AddCommand(statusCmd)
 
 	loginCmd.Flags().StringVar(&loginToken, "token", "", "GitHub personal access token with 'repo' scope")
-	loginCmd.Flags().BoolVar(&loginOAuth, "oauth", false, "Use OAuth device flow for authentication")
-	loginCmd.Flags().StringVar(&oauthClientID, "client-id", "", "OAuth App Client ID (for --oauth flow)")
 }

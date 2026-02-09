@@ -31,7 +31,7 @@ Examples:
 		tokenInfo, err := github.LoadToken()
 		if err != nil {
 			color.Red("Error: %v\n", err)
-			color.Yellow("Run 'genp login --token <token>' or 'genp login --oauth' to authenticate first.\n")
+			color.Yellow("Run 'genp login --token <token>' to authenticate first.\n")
 			return
 		}
 
