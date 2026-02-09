@@ -25,3 +25,5 @@ go.work
 
 # build file
 genp
+# Added by goreleaser init:
+dist/
