@@ -8,6 +8,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/mdxabu/genp/internal"
+	"github.com/mdxabu/genp/internal/github"
 	"github.com/mdxabu/genp/internal/store"
 	"github.com/spf13/cobra"
 )
@@ -40,9 +41,19 @@ Example:
 		color.New(color.FgYellow).Print("Do you want to store this password (y/n)?: ")
 		fmt.Scanln(&userWish)
 		if userWish == "y" {
-			store.StorepasswordLocally(password)
+			confPath := store.StorepasswordLocally(password)
+			// Sync to GitHub vault if logged in and store succeeded
+			if confPath != "" && github.IsLoggedIn() {
+				color.Cyan("Syncing to GitHub vault...\n")
+				if err := github.SyncConfigToVaultIfLoggedIn(confPath); err != nil {
+					color.Yellow("[warn] Failed to sync to GitHub vault: %v\n", err)
+					color.Yellow("  Your password is still stored locally.\n")
+				} else {
+					color.Green("[ok] Synced to GitHub genp-vault repository.\n")
+				}
+			}
 		}
-		
+
 	},
 }
 

@@ -13,7 +13,7 @@ import (
 	"github.com/mdxabu/genp/internal/crypto"
 )
 
-func StorepasswordLocally(password string) {
+func StorepasswordLocally(password string) string {
 	var passwordName string
 	color.New(color.FgCyan).Print("Enter a name for the password: ")
 	fmt.Scanln(&passwordName)
@@ -24,7 +24,7 @@ func StorepasswordLocally(password string) {
 	baseDir, err := ConfigBaseDir("genp", OSName)
 	if err != nil {
 		color.Red("Failed to determine config directory: %v\n", err)
-		return
+		return ""
 	}
 
 	// Prompt for master password
@@ -34,7 +34,7 @@ func StorepasswordLocally(password string) {
 		masterPassword, err = crypto.PromptForMasterPassword("Enter master password: ")
 		if err != nil {
 			color.Red("Failed to read master password: %v\n", err)
-			return
+			return ""
 		}
 	} else {
 		// First time - prompt with confirmation
@@ -42,7 +42,7 @@ func StorepasswordLocally(password string) {
 		masterPassword, err = crypto.PromptForMasterPasswordWithConfirm()
 		if err != nil {
 			color.Red("Failed to set master password: %v\n", err)
-			return
+			return ""
 		}
 	}
 
@@ -50,14 +50,15 @@ func StorepasswordLocally(password string) {
 	encryptedPassword, err := crypto.Encrypt(password, masterPassword)
 	if err != nil {
 		color.Red("Failed to encrypt password: %v\n", err)
-		return
+		return ""
 	}
 
 	confPath, err := StoreLocalConfig(passwordName, encryptedPassword, OSName)
 	if err != nil {
 		color.Red("Failed to store password locally: %v\n", err)
-		return
+		return ""
 	}
 
 	color.Green("Password encrypted and stored locally at: %s\n", confPath)
+	return confPath
 }
