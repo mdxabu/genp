@@ -15,6 +15,28 @@
  
  GenP is a command-line tool for generating passwords and storing them in E2EE (End-to-End Encrypted) mode. It provides a secure way to manage your passwords and ensures that only you have access to them.
 
+## Installation
+
+### Homebrew (macOS/Linux)
+
+```bash
+brew install mdxabu/tap/genp
+```
+
+### Go
+
+```bash
+go install github.com/mdxabu/genp@latest
+```
+
+### From Source
+
+```bash
+git clone https://github.com/mdxabu/genp.git
+cd genp
+go build -o genp .
+```
+
 ## Features
 
 - Generate strong, random passwords with customizable length and character sets
