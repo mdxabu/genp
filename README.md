@@ -5,14 +5,6 @@
 
 ## Installation
 
-### Homebrew (macOS/Linux)
-
-```bash
-brew tap mdxabu/tap/
-
-brew install genp
-```
-
 ### Go
 
 ```bash
